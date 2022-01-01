@@ -14,10 +14,10 @@ def get_counts_in_list(list):
 
 class abstract_player(ABC):
 
-    def __init__(self, player_number):
-        self.player_number = None
+    def __init__(self, player_name):
+        self.player_name = player_name
         self.dice_in_hand = []
-        print("initalized ab player")
+        print("initalized ab player", self.player_name)
         pass
 
     @abstractmethod
@@ -42,7 +42,9 @@ class abstract_player(ABC):
         return sum
 
     def check_valid_hand_to_pick_tile(self):
-        stealable_stones = list(globals.get_stealable_stones_dict(self.player_number).keys())
+        print(self.player_name)
+        stealable_stones = list(globals.get_stealable_stones_dict(self.player_name).keys())
+        print("stealable stones", stealable_stones)
         dice_sum = self.dice_sum()
         return ((dice_sum >= globals.active_tiles[0]) or dice_sum in stealable_stones) and ("worm" in self.dice_in_hand)
 
@@ -50,7 +52,7 @@ class abstract_player(ABC):
 class simple_player(abstract_player):
     def __init__(self, *args):
         print("initlized simple player")
-        super().__init__(args)
+        super().__init__(*args)
 
     def decide_roll_or_stop(self):
         result = "roll"
@@ -103,7 +105,6 @@ class less_dumb_player(abstract_player):
         else:
             dice_roll_numbers = list(filter(lambda x: type(x) == int and x not in self.dice_in_hand, dice_roll))
             count_dict = globals.sorted_dict(get_counts_in_list(dice_roll_numbers))
-            print(count_dict)
             result = globals.key_with_max_val(count_dict)
 
         return result
@@ -112,7 +113,7 @@ class less_dumb_player(abstract_player):
 class thief(abstract_player):
     def __init__(self, *args):
         print("initlized thief")
-        super().__init__(*args)
+        super().__init__(args)
 
     def decide_roll_or_stop(self):
         result = "roll"
@@ -132,7 +133,7 @@ class thief(abstract_player):
             result = "worm"
         else:
             dice_roll_numbers = list(filter(lambda x: type(x) == int and x not in self.dice_in_hand, dice_roll))
-            stealable_stones = list(globals.get_stealable_stones_dict(self.player_number).keys())
+            stealable_stones = list(globals.get_stealable_stones_dict(self.player_name).keys())
             count_dict = globals.sorted_dict(get_counts_in_list(dice_roll_numbers))
             
             #check for every option whether taking it results in stealing
