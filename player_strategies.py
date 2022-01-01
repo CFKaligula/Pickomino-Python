@@ -2,7 +2,6 @@
 import globals
 
 
-
 def get_counts_in_list(list):
     count_dict = {}
     for elem in list:
@@ -17,7 +16,6 @@ class abstract_player(ABC):
 
     def __init__(self, player_number):
         self.player_number = None
-        self.rollable_dice_number = 0
         self.dice_in_hand = []
         print("initalized ab player")
         pass
@@ -86,8 +84,8 @@ class less_dumb_player(abstract_player):
         if len(self.dice_in_hand) == 0:
             result = "roll"
         # if we have enough dice to pick the lowest tile and atleast one worm, stop
-        # elif self.check_valid_hand_to_pick_tile() and (self.duplicate_chance() > 0.5 or self.dice_sum() > 30):
-        elif self.check_valid_hand_to_pick_tile():
+        elif self.check_valid_hand_to_pick_tile() and (self.duplicate_chance() >= 0.3 or self.dice_sum() > 30):
+        #elif self.check_valid_hand_to_pick_tile():
             result = "stop"
 
         return result
@@ -113,7 +111,7 @@ class less_dumb_player(abstract_player):
 
 class thief(abstract_player):
     def __init__(self, *args):
-        print("initlized smart player")
+        print("initlized thief")
         super().__init__(*args)
 
     def decide_roll_or_stop(self):
@@ -136,7 +134,16 @@ class thief(abstract_player):
             dice_roll_numbers = list(filter(lambda x: type(x) == int and x not in self.dice_in_hand, dice_roll))
             stealable_stones = list(globals.get_stealable_stones_dict(self.player_number).keys())
             count_dict = globals.sorted_dict(get_counts_in_list(dice_roll_numbers))
-            print(count_dict)
-            result = globals.key_with_max_val(count_dict)
+            
+            #check for every option whether taking it results in stealing
+            for die_option in count_dict:
+                if (self.dice_sum() + count_dict[die_option]) in stealable_stones:
+                    result = die_option
+                    print("STEAL TIME",count_dict, stealable_stones)
+                    break
+
+            else:
+                # if we found no chance to steal, just take largest sum
+                result = globals.key_with_max_val(count_dict)
 
         return result

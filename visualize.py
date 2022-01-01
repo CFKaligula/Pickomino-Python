@@ -3,7 +3,7 @@
     dice_display = []
     for i in range(dice_number):
         if dice_roll[i] == "worm":
-            dice_display.append("§")
+            dice_display.append("w")
         else:
             dice_display.append(dice_roll[i])
 

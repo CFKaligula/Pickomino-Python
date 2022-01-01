@@ -1,12 +1,12 @@
-﻿from random import choices, seed
+﻿from random import choices, seed, shuffle
 import player_strategies
 import globals
 from time import sleep
 import os
 import visualize
 import sys
-# seed(1)
 
+seed(69)
 
 def sorted_dice(dice):
     return sorted(dice, key=lambda x: str(x), reverse=True)
@@ -55,7 +55,6 @@ def put_tile_back_in_active_tiles(tile, active_tiles):
 
 
 def decide_winner(round_num):
-    # decide winner
     print(f"The game is over after {round_num} rounds!")
     ranked_list = {}
     player_worm_numbers = [0 for _ in range(globals._NUMBER_OF_PLAYERS)]
@@ -78,14 +77,22 @@ def decide_winner(round_num):
 def game():
     # initialize the players
     player_strategy_list = [player_strategies.simple_player(i) for i in range(globals._NUMBER_OF_PLAYERS)]
-    player_strategy_list[5] = player_strategies.less_dumb_player(5)
+    '''
+    player_strategy_list[0] = player_strategies.less_dumb_player(0)
+    player_strategy_list[1] = player_strategies.thief(1)
+    '''
+    #randomly shuffle players so there is no first player advantage consistenly
+    shuffled_player_list = list(range(globals._NUMBER_OF_PLAYERS))
+    shuffle(shuffled_player_list)
 
     round_num = 1
+    
 
     while len(globals.active_tiles) > 0:
         #print("*"*20, "ROUND", round_num, "data:", "active tiles", globals.active_tiles, "player tiles", globals.player_tiles, "*"*20)
         round_num += 1
-        for player in range(globals._NUMBER_OF_PLAYERS):
+
+        for player in shuffled_player_list:
             print("*"*20,
                   "player turn:", player,
                   "player tiles", globals.player_tiles[player],
@@ -97,36 +104,41 @@ def game():
             player_stopped = False
             player_strategy = player_strategy_list[player]
             player_strategy.dice_in_hand = []
-            player_strategy.rollable_dice_number = globals._NUMBER_OF_DICE
+            rollable_dice_number = globals._NUMBER_OF_DICE #number of dice to roll, dice in hand + rollable dice = number of dice
 
             # roll dice while possible
-            while (not player_turn_over) and player_strategy.rollable_dice_number > 0:
+            while (not player_turn_over) and rollable_dice_number > 0:
                 roll_stop_decision = player_strategy.decide_roll_or_stop()
                 print("roll or stop decision:", roll_stop_decision)
 
+                #player decides to roll
                 if roll_stop_decision == "roll":
-                    dice_roll = sorted_dice(roll_dice(player_strategy.rollable_dice_number))
+                    dice_roll = roll_dice(rollable_dice_number)
+                    
+                    #visualize player's hand and rolled dice
                     print("dice in hand:")
                     visualize.visualize_dice(sorted_dice(player_strategy.dice_in_hand))
                     print("dice roll:")
-                    visualize.visualize_dice(dice_roll)
+                    visualize.visualize_dice(sorted_dice(dice_roll))
+                    
                     # check if it is possible for the player to pick any dice
                     dice_pick_check = check_if_player_can_pick_dice(dice_roll, player_strategy.dice_in_hand)
                     if dice_pick_check:
                         dice_pick_decision = player_strategy.decide_dice(dice_roll)
                         print("dice pick decision:", dice_pick_decision)
-
+                        
+                        #if they pick 0, means there is no possible die to pick
                         if dice_pick_decision == 0:
                             player_turn_over = True
-
+                        #extra check if a valid die is chosen
                         if dice_pick_decision not in dice_roll or dice_pick_decision in player_strategy.dice_in_hand or dice_pick_decision == 0:
                             raise Exception("INVALID DICE PICK DECISION")
 
-                        # add die from roll to player's hand
+                        # add chosen die from roll to player's hand
                         for die in dice_roll:
                             if die == dice_pick_decision:
                                 player_strategy.dice_in_hand.append(die)
-                                player_strategy.rollable_dice_number -= 1
+                                rollable_dice_number -= 1
                     else:
                         print("Turn over, no dice to pick...",
                               "dice roll:", dice_roll,
@@ -198,7 +210,12 @@ def game():
 
 def analyze():
     winner_dict = {}
-    for i in range(10000):
+    for i in range(globals._NUMBER_OF_GAMES):
+    
+        globals.enablePrint()
+        print("Game", i)
+        globals.blockPrint()
+        
         winner = game()
         globals.active_tiles = list(range(21, 37))
         globals.player_tiles = [[] for _ in range(globals._NUMBER_OF_PLAYERS)]
@@ -208,6 +225,14 @@ def analyze():
             winner_dict[winner] = 1
 
     sorted_winner_dict = globals.sorted_dict(winner_dict)
+    lines_to_write = []
+    for player in sorted_winner_dict:
+        lines_to_write.append(f"Player {player}: {sorted_winner_dict[player]} wins\n")
+    print(lines_to_write )  
+    folder_path = os.path.dirname(__file__)
+    analysis_file_path = os.path.join(folder_path,"analysis.txt")
+    with open(analysis_file_path, "w") as analysis_file:
+       analysis_file.writelines(lines_to_write)
     print(sorted_winner_dict)
 
 
