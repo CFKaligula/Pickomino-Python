@@ -2,7 +2,7 @@
 import sys
 from random import randint
 
-verbose = True
+verbose = False
 _DICE_OPTIONS = [1, 2, 3, 4, 5, "worm"]
 _NUMBER_OF_DICE = 8
 _NUMBER_OF_PLAYERS = 2

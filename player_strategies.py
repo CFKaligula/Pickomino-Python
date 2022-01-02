@@ -19,7 +19,48 @@ def get_counts_in_list(list):
                 count_dict[elem] = elem
     return count_dict
 
+def get_scores_in_dice_roll(dice_roll, dice_in_hand):
+    #for the dice option you take, remove the average value of a dice 
+    # this way taking three 3s is not better than 2 5s
+    # and also remove a number valueing the opportunity you lost by taking that option
+    # (if you take a 5 now, you lose the chance to ever take 5 again that turn)
+    count_dict = {}
+    sum_dict = {}
+    remaining_dice_dict = {}
+    choosable_dice_options = (set(globals._DICE_OPTIONS) - {"worm"}) - (set(dice_in_hand))
+    
+    average_die_val = sum(set(choosable_dice_options)) / len(set(choosable_dice_options))
+    #average_die_val = 3
+    
+    for elem in dice_roll:  
+        if elem == 'worm':
+            if elem in count_dict:
+                sum_dict[elem] += 5 - average_die_val
+                count_dict[elem] += 1
+                remaining_dice_dict[elem] -= 1
+            else:
+                sum_dict[elem] = 5 - average_die_val
+                count_dict[elem] = 1
+                remaining_dice_dict[elem] = globals._NUMBER_OF_DICE - len(dice_in_hand) -1
 
+        else:
+            if elem in count_dict:
+                sum_dict[elem] += elem - average_die_val
+                count_dict[elem] += 1
+                remaining_dice_dict[elem] -= 1
+            else:
+                sum_dict[elem] = elem - average_die_val
+                count_dict[elem] = 1
+                remaining_dice_dict[elem] = globals._NUMBER_OF_DICE - len(dice_in_hand) -1
+
+    for elem in sum_dict:
+        sum_dict[elem] = sum_dict[elem] - (remaining_dice_dict[elem]* elem/6)
+    if globals.verbose:
+        print(sum_dict)
+        print(count_dict)
+        print(remaining_dice_dict)
+    return sum_dict
+    
 class abstract_player(ABC):
 
     def __init__(self, player_name):
@@ -133,6 +174,38 @@ class simple_player(abstract_player):
         else:
             dice_roll_numbers = list(filter(lambda x: type(x) == int and x not in self.dice_in_hand, dice_roll))
             result = max(dice_roll_numbers)
+            #result = choice(list(set(dice_roll_numbers)))
+
+        return result
+    
+    
+class score_player(abstract_player):
+    def __init__(self, *args):
+        if globals.verbose:
+            print("initialized simple player")
+        super().__init__(*args)
+
+    def decide_roll_or_stop(self):
+        result = "roll"
+        if len(self.dice_in_hand) == 0:
+            result = "roll"
+        # if we have enough dice to pick the lowest tile and atleast one worm, stop
+        elif self.check_valid_hand_to_pick_tile():
+            result = "stop"
+
+        return result
+
+    def decide_dice(self, dice_roll):
+        result = 0
+        # if we do not have a worm and a worm is in the dice roll, take it
+        if "worm" in dice_roll and "worm" not in self.dice_in_hand:
+            result = "worm"
+        else:
+            dice_roll_numbers = list(filter(lambda x: type(x) == int and x not in self.dice_in_hand, dice_roll))
+            score_dict = globals.sorted_dict(get_scores_in_dice_roll(dice_roll_numbers, self.dice_in_hand))
+            if globals.verbose:
+                print("scores", score_dict)
+            result = globals.key_with_max_val(score_dict)
             #result = choice(list(set(dice_roll_numbers)))
 
         return result
@@ -268,7 +341,9 @@ class smart_player(abstract_player):
         if len(self.dice_in_hand) == 0:
             result = "roll"
         # if we have enough dice to pick the lowest tile and atleast one worm, stop
-        elif self.check_valid_hand_to_pick_tile() and (self.duplicate_chance() >= 0.5 or self.dice_sum() > 25):
+        elif self.check_valid_hand_to_pick_tile():
+        
+        #elif self.check_valid_hand_to_pick_tile() and (self.duplicate_chance() >= 0.5 or self.dice_sum() > 25):
             result = "stop"
 
         return result

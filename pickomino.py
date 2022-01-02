@@ -148,11 +148,11 @@ def decide_winner(round_num, shuffled_player_list):
 
 def game():
     # assign player strategies
-    player_strategy_list = {globals.player_name_dict[i]: player_strategies.smart_player(globals.player_name_dict[i])
+    player_strategy_list = {globals.player_name_dict[i]: player_strategies.score_player(globals.player_name_dict[i])
                             for i in range(1, globals._NUMBER_OF_PLAYERS+1)}
 
-    player_strategy_list[globals.player_name_dict[1]] = player_strategies.human_player(globals.player_name_dict[1])
-    player_strategy_list[globals.player_name_dict[2]] = player_strategies.human_player(globals.player_name_dict[2])
+    player_strategy_list[globals.player_name_dict[1]] = player_strategies.score_player(globals.player_name_dict[1])
+    player_strategy_list[globals.player_name_dict[2]] = player_strategies.simple_player(globals.player_name_dict[2])
     '''
     player_strategy_list[globals.player_name_dict[3]] = player_strategies.simple_player(globals.player_name_dict[3])
     player_strategy_list[globals.player_name_dict[4]] = player_strategies.simple_thief(globals.player_name_dict[4])
