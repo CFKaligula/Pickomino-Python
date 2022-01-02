@@ -10,19 +10,15 @@ def histogram_analysis():
         lines = analysis_file.readlines()
 
     data = []
-
-
     for line in lines:
-        m0 = re.search(r"([0-9]*) w", line)
-        data.append(int(m0.group(1)))
+        number_of_wins = re.search(r"([0-9]*) w", line)
+        data.append(int(number_of_wins.group(1)))
     print("data",data)
-
 
     count_data = []
     for i in range(len(data)):
         count_data.extend([i]*int(data[i]))
     print(count_data)  
-
 
     plt.style.use('ggplot')
     plt.hist(count_data, bins = 100)
@@ -54,4 +50,4 @@ def run_multiple_times():
     plt.show()
     
     
-run_multiple_times()
+histogram_analysis()
