@@ -45,10 +45,8 @@ def let_player_roll(rollable_dice_number, player_strategy):
     #roll the dice
     dice_roll = roll_dice(rollable_dice_number)
 
-    # visualize player's hand and rolled dice
+    # visualize rolled dice
     if globals.verbose: 
-        print("dice in hand:")
-        visualize.visualize_dice(player_strategy.dice_in_hand)
         print("dice roll:")
         visualize.visualize_dice(dice_roll)
 
@@ -144,8 +142,8 @@ def game():
     player_strategy_list = {globals.player_name_dict[i]: player_strategies.smart_player(globals.player_name_dict[i]) 
                                 for i in range(1, globals._NUMBER_OF_PLAYERS+1)}
    
-    player_strategy_list[globals.player_name_dict[1]] = player_strategies.simple_player(globals.player_name_dict[1])
-    player_strategy_list[globals.player_name_dict[2]] = player_strategies.smart_player(globals.player_name_dict[2])
+    player_strategy_list[globals.player_name_dict[1]] = player_strategies.human_player(globals.player_name_dict[1])
+    player_strategy_list[globals.player_name_dict[2]] = player_strategies.human_player(globals.player_name_dict[2])
     '''
     player_strategy_list[globals.player_name_dict[3]] = player_strategies.simple_player(globals.player_name_dict[3])
     player_strategy_list[globals.player_name_dict[4]] = player_strategies.simple_thief(globals.player_name_dict[4])
@@ -154,10 +152,8 @@ def game():
 
     ''' 
     # randomly shuffle players so there is no first player advantage consistenly
-    shuffled_player_list = sample(globals._PLAYER_NAME_LIST, globals._NUMBER_OF_PLAYERS)
-        
+    shuffled_player_list = sample(globals._PLAYER_NAME_LIST, globals._NUMBER_OF_PLAYERS)   
     if globals.verbose: print(shuffled_player_list)
-
     round_num = 1
 
     while len(globals.active_tiles) > 0:
@@ -179,6 +175,11 @@ def game():
 
             # roll dice while possible
             while (not player_turn_over) and rollable_dice_number > 0:
+                if globals.verbose:
+                    print("dice in hand:")
+                    visualize.visualize_dice(player_strategy.dice_in_hand)
+                    print("total sum:", player_strategy.dice_sum())
+                    
                 roll_stop_decision = player_strategy.decide_roll_or_stop()
                 if globals.verbose: print("roll or stop decision:", roll_stop_decision)
 

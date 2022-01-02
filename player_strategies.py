@@ -54,6 +54,37 @@ class abstract_player(ABC):
         dice_sum = self.dice_sum()
         return ((dice_sum >= globals.active_tiles[0]) or dice_sum in stealable_stones) and ("worm" in self.dice_in_hand)
 
+
+class human_player(abstract_player):
+    def __init__(self, *args):
+            if globals.verbose: print("initialized simple player")
+            super().__init__(*args)
+
+    def decide_roll_or_stop(self):
+        user_input = input("Do you want to roll or stop? (r/s)")
+        if user_input.startswith("r"):
+            result = "roll"
+        else:
+            result = "stop"
+
+        return result
+
+    def decide_dice(self, dice_roll):
+        dice_roll_options = list(filter(lambda x: x not in self.dice_in_hand, dice_roll))
+        user_input = input(f"What dice do you want to pick? {list(set(dice_roll_options))}")
+        if user_input.startswith("w"):
+            user_input = "worm"
+        if user_input.isnumeric():
+            user_input = int(user_input)
+        while user_input not in dice_roll_options:
+            user_input = input(f"NOT A VALID OPTION!!\nWhat dice do you want to pick? {list(set(dice_roll_options))}")
+            if user_input != "worm":
+                user_input = int(user_input)
+
+        return user_input
+      
+        
+
 class random_player(abstract_player):
     def __init__(self, *args):
         if globals.verbose: print("initialized simple player")
