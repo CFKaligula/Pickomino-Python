@@ -1,4 +1,11 @@
-﻿def visualize_dice(dice_roll):
+﻿
+def sorted_dice(dice):
+    return sorted(dice, key=lambda x: str(x), reverse=True)
+
+
+
+def visualize_dice(dice_roll):
+    dice_roll = sorted_dice(dice_roll)
     dice_number = len(dice_roll)
     dice_display = []
     for i in range(dice_number):
