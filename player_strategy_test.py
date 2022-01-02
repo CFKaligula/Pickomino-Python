@@ -7,6 +7,7 @@ import os
 
 _NUMBER_OF_DICE_ROLLS = 1000
 player_strategy = player_strategies.smart_player("player")
+
 for i in range(_NUMBER_OF_DICE_ROLLS):
     globals.active_tiles = list(range(21, 37))
 

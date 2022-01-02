@@ -25,31 +25,4 @@ def histogram_analysis():
     plt.hist(count_data, bins=100)
     plt.show()
 
-
-def run_multiple_times():
-    let_analysis_file_path = os.path.join(folder_path, "let_analysis.txt")
-    with open(let_analysis_file_path, "w") as analysis_file:
-        analysis_file.write("")
-    for i in range(1000):
-        print(i)
-        os.system(f"python {os.path.join(folder_path, 'picomino.py')}")
-
-    with open(let_analysis_file_path, "r") as analysis_file:
-        lines = analysis_file.readlines()
-    data = []
-    for line in lines:
-        data.append(line.strip())
-    print("data", data)
-    count_dict = {}
-    for d in data:
-        if d in count_dict:
-            count_dict[d] += 1
-        else:
-            count_dict[d] = 1
-    print(count_dict)
-    plt.style.use('ggplot')
-    plt.hist(data)
-    plt.show()
-
-
 histogram_analysis()

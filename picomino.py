@@ -98,21 +98,18 @@ def player_loses_turn(player_name):
 def player_takes_tile(player_strategy, player_name):
     player_dice_sum = player_strategy.dice_sum()
     stealable_tiles_dict = globals.get_stealable_tiles_dict(player_name)
-    # if the chosen tile is stealable:
-    # 1. remove it from player who currently owns it
-    # 2. add it to the player's tiles
+    # if there is a stealable tile
     if player_dice_sum in stealable_tiles_dict:
         if globals.verbose:
             print(f"tile {player_dice_sum} will be stolen", globals.player_tiles)
         player_name_to_be_stolen_from = stealable_tiles_dict[player_dice_sum]
+        # remove it from player who currently owns it
         globals.player_tiles[player_name_to_be_stolen_from].remove(player_dice_sum)
+        # add it to the player's tiles
         globals.player_tiles[player_name].append(player_dice_sum)
         if globals.verbose:
             print("tile is stolen", globals.player_tiles)
-
-    # if the chosen tile is in the active tiles:
-    # 1. remove it from active tiles
-    # 2. add it to the player's tiles
+    # if the chosen tile is in the active tiles
     else:
         chosen_tile = get_closest_lower_tile(player_dice_sum, globals.active_tiles)
         if chosen_tile is None:
@@ -120,7 +117,9 @@ def player_takes_tile(player_strategy, player_name):
             input("how did we get here")
         if globals.verbose:
             print("tile to be taken from active:", chosen_tile, "active tiles:", globals.active_tiles)
+        # remove it from active tiles
         globals.active_tiles.remove(chosen_tile)
+        # add it to the player's tiles
         globals.player_tiles[player_name].append(chosen_tile)
         if globals.verbose:
             print("added tile", globals.player_tiles)
@@ -269,4 +268,3 @@ def analyze():
 if __name__ == '__main__':
     # game()
     analyze()
-    # let_analyzed()
