@@ -1,6 +1,6 @@
 import globals
 import player_strategies
-from picomino import roll_dice, let_player_roll
+from pickomino import roll_dice, let_player_roll
 from random import randint, choices
 import visualize
 import os
