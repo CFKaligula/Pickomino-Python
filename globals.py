@@ -24,8 +24,10 @@ player_name_dict = {
 _PLAYER_NAME_LIST = list(player_name_dict.values())[:_NUMBER_OF_PLAYERS]
 player_tiles = {_PLAYER_NAME_LIST[i]: [] for i in range(_NUMBER_OF_PLAYERS)}
 
+
 def reverse_dict(dict):
     return {v: k for k, v in dict.items()}
+
 
 player_index_dict = reverse_dict(player_name_dict)
 
@@ -38,24 +40,25 @@ def key_with_max_val(dict):
     v = list(dict.values())
     max_val = max(v)
     max_index = 0
-    #make sure we take a random key if there are multiple max elements
+    # make sure we take a random key if there are multiple max elements
     for i in range(randint(1, v.count(max_val))):
         max_index = v.index(max_val, max_index)
     k = list(dict.keys())
     return k[max_index]
 
 
-def get_stealable_stones_dict(current_player_name):
+def get_stealable_tiles_dict(current_player_name):
     # makes a dictionary where the keys are the stealable tiles and values are the player who owns that tiles
-    # stealable stones are the last taken stones
+    # stealable tiles are the last taken tiles
     player_name_list = list(player_tiles.keys())
-    stealable_stones_dict = {}
-    
+    stealable_tiles_dict = {}
+
     for player_name in _PLAYER_NAME_LIST:
-       if player_name != current_player_name and len(player_tiles[player_name]) > 0:
-            if verbose: print(player_name, current_player_name, player_name != current_player_name and len(player_tiles[player_name]) > 0, player_tiles[player_name][-1])
-   
-            stealable_stones_dict[player_tiles[player_name][-1]] = player_name
-        
-          
-    return stealable_stones_dict
+        if player_name != current_player_name and len(player_tiles[player_name]) > 0:
+            if verbose:
+                print(player_name, current_player_name, player_name != current_player_name and len(
+                    player_tiles[player_name]) > 0, player_tiles[player_name][-1])
+
+            stealable_tiles_dict[player_tiles[player_name][-1]] = player_name
+
+    return stealable_tiles_dict
